@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'contact_page.dart';
 
+// Post Model
 class Post {
   final String username;
   final String userSubtitle;
   final String userAvatarUrl;
   final String postImageUrl;
-  final String? localAsset; // optional local asset path
   final String caption;
   int likes;
   bool isLiked;
@@ -17,7 +18,6 @@ class Post {
     required this.userSubtitle,
     required this.userAvatarUrl,
     required this.postImageUrl,
-    this.localAsset,
     required this.caption,
     required this.likes,
     this.isLiked = false,
@@ -34,37 +34,41 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // 4 Unique Posts with Network Images and Pre-loaded Comments
+  // 4 Posts with CORS-compliant Picsum Image URLs
   final List<Post> posts = [
     Post(
-      username: 'Modinho',
-      userSubtitle: 'The only one',
-      userAvatarUrl: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150',
-      postImageUrl: '',
-      localAsset: 'assets/images/modinho.jpg',
-      caption: '400 goals',
-      likes: 0,
-      comments: [],
+      username: 'flutter_student',
+      userSubtitle: 'Learning Flutter',
+      userAvatarUrl: 'https://picsum.photos/id/64/150/150',
+      postImageUrl: 'https://picsum.photos/id/10/800/800',
+      caption: 'Learning Flutter one widget at a time! 🚀',
+      likes: 42,
+      comments: [
+        {'user': 'alex_dev', 'text': 'Flutter UI looks super clean! 🔥'},
+        {'user': 'sarah_codes', 'text': 'Great composition in this shot 👌'},
+        {'user': 'john_flutter', 'text': 'Keep up the good work! 🚀'},
+        {'user': 'emily_tech', 'text': 'Love the rounded card design! ❤️'},
+      ],
     ),
     Post(
-      username: 'Mbappu',
-      userSubtitle: 'Goat he kehde',
-      userAvatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
-      postImageUrl: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800',
-      caption: 'Writing clean, asynchronous code with Dart 3 ⚡',
+      username: 'dart_master',
+      userSubtitle: 'Dart & Mobile Dev',
+      userAvatarUrl: 'https://picsum.photos/id/91/150/150',
+      postImageUrl: 'https://picsum.photos/id/20/800/800',
+      caption: 'Writing clean, asynchronous code with Dart ⚡',
       likes: 128,
       comments: [
-        {'user': 'flutter_fan', 'text': 'Dart 3 pattern matching is amazing!'},
+        {'user': 'flutter_fan', 'text': 'Pattern matching in Dart is amazing!'},
         {'user': 'coder_guy', 'text': 'Best language for modern app dev.'},
         {'user': 'ui_designer', 'text': 'Super clean architecture.'},
         {'user': 'dev_sam', 'text': 'Keep these developer tips coming! 🙌'},
       ],
     ),
     Post(
-      username: 'Bheege Hoth',
-      userSubtitle: 'Pyaar se maru',
-      userAvatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
-      postImageUrl: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=800',
+      username: 'ui_designer_pro',
+      userSubtitle: 'UI/UX & Animation',
+      userAvatarUrl: 'https://picsum.photos/id/103/150/150',
+      postImageUrl: 'https://picsum.photos/id/26/800/800',
       caption: 'Designing sleek and modern user interfaces in Flutter 🎨',
       likes: 89,
       comments: [
@@ -75,10 +79,10 @@ class _HomePageState extends State<HomePage> {
       ],
     ),
     Post(
-      username: 'Baba G',
-      userSubtitle: 'The only fit player',
-      userAvatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
-      postImageUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800',
+      username: 'cloud_architect',
+      userSubtitle: 'Backend & Firebase',
+      userAvatarUrl: 'https://picsum.photos/id/177/150/150',
+      postImageUrl: 'https://picsum.photos/id/42/800/800',
       caption: 'Real-time database integration deployed to production! ☁️🔥',
       likes: 215,
       comments: [
@@ -92,7 +96,15 @@ class _HomePageState extends State<HomePage> {
 
   final TextEditingController _commentController = TextEditingController();
 
-  // Continuously increment likes
+  // Helper method to navigate to Contact & Services Page
+  void openContactPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ContactPage()),
+    );
+  }
+
+  // Increment likes on every tap
   void addLike(Post post) {
     setState(() {
       post.likes++;
@@ -100,11 +112,12 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  // Toggle bookmark save
+  // Toggle bookmark saved state
   void toggleSave(Post post) {
     setState(() {
       post.isSaved = !post.isSaved;
     });
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -115,7 +128,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Interactive Comments Modal Bottom Sheet
+  // Comments Bottom Sheet Modal
   void openCommentModal(Post post) {
     showModalBottomSheet(
       context: context,
@@ -258,6 +271,9 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // ==========================================
+      // APP BAR
+      // ==========================================
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -270,6 +286,12 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         actions: [
+          // Contact Page Navigation Icon Button
+          IconButton(
+            tooltip: 'Contact & Services',
+            onPressed: openContactPage,
+            icon: const Icon(Icons.support_agent, color: Colors.black87),
+          ),
           IconButton(
             onPressed: () {},
             icon: const Icon(Icons.favorite_border),
@@ -280,22 +302,82 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
+
+      // ==========================================
+      // BODY FEED
+      // ==========================================
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 550),
           child: ListView.separated(
-            itemCount: posts.length,
+            itemCount: posts.length + 1, // +1 for the Contact Us banner at top
             separatorBuilder: (context, index) => const Divider(
               thickness: 1,
               height: 40,
               color: Color(0xFFEEEEEE),
             ),
             itemBuilder: (context, index) {
-              final post = posts[index];
+              // INDEX 0: Contact & Services Banner Button
+              if (index == 0) {
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF3F4F6),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: Row(
+                      children: [
+                        const CircleAvatar(
+                          backgroundColor: Colors.white,
+                          child: Icon(Icons.design_services_outlined, color: Colors.black87),
+                        ),
+                        const SizedBox(width: 12),
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Need Services or Help?',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              Text(
+                                'Explore our Flutter packages & support',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        FilledButton(
+                          onPressed: openContactPage,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: const Text('Contact Page'),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+
+              // INDEX 1 to 4: The Posts
+              final post = posts[index - 1];
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // User Profile Row
+                  // User Profile Section
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Row(
@@ -339,56 +421,40 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
 
-                  // Post Image in Curved Box
+                  // Curved Post Image Box
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(20),
-                      child: post.localAsset != null
-                          ? Image.asset(
-                              post.localAsset!,
-                              width: double.infinity,
-                              height: 380,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  height: 380,
-                                  color: Colors.grey[200],
-                                  child: const Center(
-                                    child: Icon(Icons.broken_image, size: 50, color: Colors.grey),
-                                  ),
-                                );
-                              },
-                            )
-                          : Image.network(
-                              post.postImageUrl,
-                              width: double.infinity,
-                              height: 380,
-                              fit: BoxFit.cover,
-                              loadingBuilder: (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return Container(
-                                  height: 380,
-                                  color: Colors.grey[100],
-                                  child: const Center(
-                                    child: CircularProgressIndicator(),
-                                  ),
-                                );
-                              },
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  height: 380,
-                                  color: Colors.grey[200],
-                                  child: const Center(
-                                    child: Icon(Icons.broken_image, size: 50, color: Colors.grey),
-                                  ),
-                                );
-                              },
+                      child: Image.network(
+                        post.postImageUrl,
+                        width: double.infinity,
+                        height: 380,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            height: 380,
+                            color: Colors.grey[100],
+                            child: const Center(
+                              child: CircularProgressIndicator(),
                             ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            height: 380,
+                            color: Colors.grey[200],
+                            child: const Center(
+                              child: Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
 
-                  // Action Buttons
+                  // Actions Row
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     child: Row(
@@ -422,7 +488,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
 
-                  // Like Counter
+                  // Likes Counter
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
@@ -455,7 +521,7 @@ class _HomePageState extends State<HomePage> {
 
                   const SizedBox(height: 6),
 
-                  // View Comments Trigger
+                  // Comments Action Link
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: GestureDetector(
@@ -472,7 +538,7 @@ class _HomePageState extends State<HomePage> {
 
                   const SizedBox(height: 12),
 
-                  // Increment Like Button
+                  // Full-width Like Button
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: SizedBox(

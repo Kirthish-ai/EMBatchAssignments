@@ -12,14 +12,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-
-      title: 'My First Flutter App',
-
+      title: 'Instagram App',
       theme: ThemeData(
         useMaterial3: true,
         scaffoldBackgroundColor: Colors.white,
       ),
-
       home: const HomePage(),
     );
   }
